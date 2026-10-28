@@ -1,0 +1,1 @@
+# rental-scam-checker
