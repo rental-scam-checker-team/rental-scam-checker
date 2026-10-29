@@ -1,4 +1,6 @@
+using System.Data;
 using System.Globalization;
+using Microsoft.Data.SqlClient;
 
 namespace RSC.Classes;
 
@@ -15,6 +17,9 @@ public class RiskCheck
     public string? ReviewNote { get; set; }
     public DateTime CheckedDate { get; set; }
     public bool UserNotified { get; set; }
+
+    /// <summary>Address of the listing, read from tblListing for display only (not a column in tblRiskCheck).</summary>
+    public string? ListingAddress { get; set; }
 
     // Limits shared by Valid() and the tests
     public const int MinScore = 0;
@@ -83,5 +88,55 @@ public class RiskCheck
         }
 
         return error.Trim();
+    }
+
+    /// <summary>
+    /// FIND: loads one risk check by its ID into this object.
+    /// Returns true if it was found, false if no check has that ID. Jira: RSC-29.
+    /// </summary>
+    public bool Find(int riskCheckId)
+    {
+        using var conn = new SqlConnection(DbSettings.ConnectionString);
+        conn.Open();
+        using var cmd = new SqlCommand("sproc_tblRiskCheck_FilterByRiskCheckId", conn);
+        cmd.CommandType = CommandType.StoredProcedure;
+        cmd.Parameters.AddWithValue("@RiskCheckId", riskCheckId);
+
+        using var reader = cmd.ExecuteReader();
+        if (!reader.Read())
+        {
+            return false;
+        }
+
+        CopyFrom(FromRecord(reader));
+        return true;
+    }
+
+    /// <summary>Builds a RiskCheck from one row returned by a stored procedure.</summary>
+    internal static RiskCheck FromRecord(IDataRecord row)
+    {
+        return new RiskCheck
+        {
+            RiskCheckId = row.GetInt32(row.GetOrdinal("RiskCheckId")),
+            ListingId = row.GetInt32(row.GetOrdinal("ListingId")),
+            ListingAddress = row.IsDBNull(row.GetOrdinal("Address")) ? null : row.GetString(row.GetOrdinal("Address")),
+            RiskScore = row.GetInt32(row.GetOrdinal("RiskScore")),
+            Flags = row.GetString(row.GetOrdinal("Flags")),
+            ReviewNote = row.IsDBNull(row.GetOrdinal("ReviewNote")) ? null : row.GetString(row.GetOrdinal("ReviewNote")),
+            CheckedDate = row.GetDateTime(row.GetOrdinal("CheckedDate")),
+            UserNotified = row.GetBoolean(row.GetOrdinal("UserNotified"))
+        };
+    }
+
+    private void CopyFrom(RiskCheck other)
+    {
+        RiskCheckId = other.RiskCheckId;
+        ListingId = other.ListingId;
+        ListingAddress = other.ListingAddress;
+        RiskScore = other.RiskScore;
+        Flags = other.Flags;
+        ReviewNote = other.ReviewNote;
+        CheckedDate = other.CheckedDate;
+        UserNotified = other.UserNotified;
     }
 }
