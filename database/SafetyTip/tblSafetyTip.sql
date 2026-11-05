@@ -44,7 +44,7 @@ BEGIN
     INSERT INTO tblSafetyTip (Title, Description, Category, Priority, IsPublished, DateAdded)
     VALUES (@Title, @Description, @Category, @Priority, @IsPublished, @DateAdded);
 
-    SELECT SCOPE_IDENTITY() AS TipId;
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS TipId;
 END
 GO
 
