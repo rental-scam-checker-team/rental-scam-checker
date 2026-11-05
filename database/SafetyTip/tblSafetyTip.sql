@@ -29,3 +29,93 @@ VALUES
     ('Ask for the keys at handover', 'Only pay the first rent when you can collect the keys and see that they open the door of the flat.', 'Viewing', 1, 0, '2026-10-14'),
     ('Deposit max 3 months'' rent', 'In Denmark a landlord can ask for a deposit of at most three months of rent. If they ask for more, be careful.', 'Contract', 1, 0, '2026-10-15');
 GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_Insert;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_Insert
+    @Title        NVARCHAR(100),
+    @Description  NVARCHAR(500),
+    @Category     NVARCHAR(50),
+    @Priority     INT,
+    @IsPublished  BIT,
+    @DateAdded    DATE
+AS
+BEGIN
+    INSERT INTO tblSafetyTip (Title, Description, Category, Priority, IsPublished, DateAdded)
+    VALUES (@Title, @Description, @Category, @Priority, @IsPublished, @DateAdded);
+
+    SELECT SCOPE_IDENTITY() AS TipId;
+END
+GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_Update;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_Update
+    @TipId        INT,
+    @Title        NVARCHAR(100),
+    @Description  NVARCHAR(500),
+    @Category     NVARCHAR(50),
+    @Priority     INT,
+    @IsPublished  BIT,
+    @DateAdded    DATE
+AS
+BEGIN
+    UPDATE tblSafetyTip
+    SET Title       = @Title,
+        Description = @Description,
+        Category    = @Category,
+        Priority    = @Priority,
+        IsPublished = @IsPublished,
+        DateAdded   = @DateAdded
+    WHERE TipId = @TipId;
+END
+GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_Delete;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_Delete
+    @TipId  INT
+AS
+BEGIN
+    DELETE FROM tblSafetyTip
+    WHERE TipId = @TipId;
+END
+GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_SelectAll;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_SelectAll
+AS
+BEGIN
+    SELECT TipId, Title, Description, Category, Priority, IsPublished, DateAdded
+    FROM tblSafetyTip
+    ORDER BY Priority DESC, TipId;
+END
+GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_FilterByTipId;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_FilterByTipId
+    @TipId  INT
+AS
+BEGIN
+    SELECT TipId, Title, Description, Category, Priority, IsPublished, DateAdded
+    FROM tblSafetyTip
+    WHERE TipId = @TipId;
+END
+GO
+
+DROP PROCEDURE IF EXISTS sproc_tblSafetyTip_Filter;
+GO
+CREATE PROCEDURE sproc_tblSafetyTip_Filter
+    @Category     NVARCHAR(50) = NULL,
+    @IsPublished  BIT          = NULL
+AS
+BEGIN
+    SELECT TipId, Title, Description, Category, Priority, IsPublished, DateAdded
+    FROM tblSafetyTip
+    WHERE (@Category IS NULL OR Category = @Category)
+      AND (@IsPublished IS NULL OR IsPublished = @IsPublished)
+    ORDER BY Priority DESC, TipId;
+END
+GO
