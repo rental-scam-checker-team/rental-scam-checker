@@ -1,0 +1,35 @@
+/* Risk checks pages (Guru Prasad Kandel) */
+.rc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.rc-header h1 { margin: 0; }
+
+.rc-filters { display: grid; grid-template-columns: repeat(5, 1fr) auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem; }
+.rc-filters .actions { display: flex; gap: 0.5rem; }
+
+.rc-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.rc-table th, .rc-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); }
+.rc-table th { background: #eef1f5; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.rc-table td.num { font-variant-numeric: tabular-nums; }
+.rc-table .row-actions { white-space: nowrap; display: flex; gap: 0.75rem; }
+.rc-table tr.unread td:first-child { font-weight: 700; }
+
+.level { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; color: #fff; }
+.level.Low { background: var(--low); }
+.level.Medium { background: var(--medium); }
+.level.High { background: var(--high); }
+
+.rc-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 720px; }
+.rc-form .full { grid-column: 1 / -1; }
+.rc-form .check { display: flex; gap: 0.5rem; align-items: center; font-weight: 600; }
+.rc-form .check input { width: auto; }
+.rc-form .buttons { grid-column: 1 / -1; display: flex; gap: 0.75rem; }
+
+.report-top { display: flex; gap: 2rem; align-items: center; }
+.score { font-size: 3rem; font-weight: 800; line-height: 1; }
+.score small { font-size: 1rem; color: var(--muted); font-weight: 400; }
+.flags li { margin-bottom: 0.4rem; }
+.report-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1rem; margin-top: 1rem; }
+.report-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+
+@media (max-width: 760px) {
+  .rc-filters, .rc-form, .report-grid { grid-template-columns: 1fr; }
+}
