@@ -1,4 +1,9 @@
+using RSC.Classes;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Tell the middle layer where the database is (appsettings.json -> ConnectionStrings:RSC)
+DbSettings.ConnectionString = builder.Configuration.GetConnectionString("RSC") ?? DbSettings.ConnectionString;
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
