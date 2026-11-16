@@ -1,0 +1,14 @@
+/* Styles for the Listings pages only (owner: Aman Paudel) */
+.listings, .listing-form { max-width: 960px; margin: 0 auto; padding: 16px; text-align: left; }
+.listings-header { display: flex; justify-content: space-between; align-items: center; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.toolbar input { width: 120px; }
+.listings table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+.listings th, .listings td { border-bottom: 1px solid #ccc; padding: 6px 8px; }
+.listings .actions { white-space: nowrap; }
+.listings .actions button { margin-right: 4px; }
+.listing-form label { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+.listing-form label.checkbox { flex-direction: row; align-items: center; }
+.listing-form .buttons { display: flex; gap: 8px; }
+.error { color: #b00020; }
+.message { color: #1b5e20; }
