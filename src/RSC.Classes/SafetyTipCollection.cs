@@ -5,16 +5,9 @@ namespace RSC.Classes;
 
 public class SafetyTipCollection
 {
-    private readonly string _connectionString;
-
-    public SafetyTipCollection(string connectionString)
-    {
-        _connectionString = connectionString;
-    }
-
     public int Add(SafetyTip tip)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_Insert", connection);
         command.CommandType = CommandType.StoredProcedure;
         AddTipValues(command, tip);
@@ -25,7 +18,7 @@ public class SafetyTipCollection
 
     public void Update(SafetyTip tip)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_Update", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@TipId", tip.TipId);
@@ -37,7 +30,7 @@ public class SafetyTipCollection
 
     public void Delete(int tipId)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_Delete", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@TipId", tipId);
@@ -48,7 +41,7 @@ public class SafetyTipCollection
 
     public List<SafetyTip> GetAll()
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_SelectAll", connection);
         command.CommandType = CommandType.StoredProcedure;
 
@@ -57,7 +50,7 @@ public class SafetyTipCollection
 
     public SafetyTip? Find(int tipId)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_FilterByTipId", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@TipId", tipId);
@@ -67,7 +60,7 @@ public class SafetyTipCollection
 
     public List<SafetyTip> Filter(string? category, bool? isPublished)
     {
-        using var connection = new SqlConnection(_connectionString);
+        using var connection = new SqlConnection(DbSettings.ConnectionString);
         using var command = new SqlCommand("sproc_tblSafetyTip_Filter", connection);
         command.CommandType = CommandType.StoredProcedure;
         command.Parameters.AddWithValue("@Category", (object?)category ?? DBNull.Value);

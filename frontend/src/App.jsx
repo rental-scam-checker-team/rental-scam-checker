@@ -4,6 +4,7 @@ import RiskCheckForm from './pages/riskchecks/RiskCheckForm.jsx'
 import RiskCheckDelete from './pages/riskchecks/RiskCheckDelete.jsx'
 import RiskReport from './pages/riskchecks/RiskReport.jsx'
 import ListingsPage from './listings/ListingsPage.jsx'
+import SafetyTipsPage from './safetytips/SafetyTipsPage.jsx'
 
 // App shell: top bar + one route per page.
 // Each team member adds their own nav link and routes here (Listings, Price benchmarks, Safety tips).
@@ -15,6 +16,7 @@ export default function App() {
         <nav>
           <NavLink to="/listings">Listings</NavLink>
           <NavLink to="/riskchecks">Risk checks</NavLink>
+          <NavLink to="/safetytips">Safety tips</NavLink>
         </nav>
       </header>
 
@@ -31,6 +33,9 @@ export default function App() {
           <Route path="/riskchecks/:id" element={<RiskReport />} />
           <Route path="/riskchecks/:id/edit" element={<RiskCheckForm />} />
           <Route path="/riskchecks/:id/delete" element={<RiskCheckDelete />} />
+
+          {/* Safety tips (Ambika Pandey) */}
+          <Route path="/safetytips" element={<SafetyTipsPage />} />
 
           <Route path="*" element={<p>Page not found.</p>} />
         </Routes>

@@ -7,12 +7,7 @@ namespace RSC.Api.Controllers;
 [Route("api/safetytips")]
 public class SafetyTipsController : ControllerBase
 {
-    private readonly SafetyTipCollection _tips;
-
-    public SafetyTipsController(IConfiguration configuration)
-    {
-        _tips = new SafetyTipCollection(configuration.GetConnectionString("RSC")!);
-    }
+    private readonly SafetyTipCollection _tips = new SafetyTipCollection();
 
     [HttpGet]
     public ActionResult<List<SafetyTip>> List([FromQuery] string? category, [FromQuery] bool? isPublished)
