@@ -1,14 +1,38 @@
-/* Styles for the Listings pages only (owner: Aman Paudel) */
-.listings, .listing-form { max-width: 960px; margin: 0 auto; padding: 16px; text-align: left; }
-.listings-header { display: flex; justify-content: space-between; align-items: center; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
-.toolbar input { width: 120px; }
-.listings table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-.listings th, .listings td { border-bottom: 1px solid #ccc; padding: 6px 8px; }
-.listings .actions { white-space: nowrap; }
-.listings .actions button { margin-right: 4px; }
-.listing-form label { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
-.listing-form label.checkbox { flex-direction: row; align-items: center; }
-.listing-form .buttons { display: flex; gap: 8px; }
-.error { color: #b00020; }
-.message { color: #1b5e20; }
+/* Listings pages (Aman Paudel).
+   Buttons, cards, messages and inputs come from the shared team styles in index.css
+   (.btn, .btn.secondary, .btn.danger, .card, .message). This file only adds the layout. */
+
+.ls-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.ls-header h1 { margin: 0; }
+
+/* Filter box: city, min rent, max rent, furnished, then the buttons */
+.ls-filters { display: grid; grid-template-columns: repeat(4, 1fr) auto; gap: 0.75rem; align-items: end; margin-bottom: 1rem; }
+.ls-filters .actions { display: flex; gap: 0.5rem; }
+
+/* Find by ID */
+.ls-find { display: flex; gap: 0.5rem; align-items: end; margin-bottom: 1rem; max-width: 320px; }
+.ls-find > div { flex: 1; }
+
+/* Table of listings */
+.ls-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.ls-table th, .ls-table td { text-align: left; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--line); }
+.ls-table th { background: #eef1f5; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); }
+.ls-table td.num { font-variant-numeric: tabular-nums; }
+.ls-table .row-actions { white-space: nowrap; display: flex; gap: 0.5rem; }
+.ls-table .btn { padding: 0.3rem 0.75rem; font-size: 0.9rem; }
+
+/* Furnished yes/no badge */
+.ls-badge { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+.ls-badge.yes { background: #e8f5ec; color: #1e5631; }
+.ls-badge.no { background: #eef1f5; color: var(--muted); }
+
+/* Add / edit form: two columns, address and buttons across the whole width */
+.ls-form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 720px; }
+.ls-form .full { grid-column: 1 / -1; }
+.ls-form .check { display: flex; gap: 0.5rem; align-items: center; font-weight: 600; }
+.ls-form .check input { width: auto; }
+.ls-form .buttons { grid-column: 1 / -1; display: flex; gap: 0.75rem; }
+
+@media (max-width: 760px) {
+  .ls-filters, .ls-form { grid-template-columns: 1fr; }
+}

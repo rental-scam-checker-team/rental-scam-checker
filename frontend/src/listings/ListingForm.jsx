@@ -42,49 +42,58 @@ export default function ListingForm({ listing, cities, onSaved, onCancel }) {
   }
 
   return (
-    <form className="listing-form" onSubmit={save}>
-      <h2>{editing ? `Edit listing ${listing.listingId}` : 'Add a listing'}</h2>
-
-      <label>
-        Address
-        <input value={form.address} onChange={change('address')} maxLength={100}
-               placeholder="Nørrebrogade 45, 2. th." />
-      </label>
-
-      <label>
-        City
-        <select value={form.area} onChange={change('area')}>
-          <option value="">Choose a city</option>
-          {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-      </label>
-
-      <label>
-        Monthly rent (kr)
-        <input type="number" step="0.01" min="0" value={form.monthlyRent} onChange={change('monthlyRent')} />
-      </label>
-
-      <label>
-        Size (m²)
-        <input type="number" step="1" value={form.sizeM2} onChange={change('sizeM2')} />
-      </label>
-
-      <label>
-        Date the ad was posted
-        <input type="date" max={today} value={form.postedDate} onChange={change('postedDate')} />
-      </label>
-
-      <label className="checkbox">
-        <input type="checkbox" checked={form.furnished} onChange={change('furnished')} />
-        Furnished
-      </label>
-
-      {error && <p className="error">{error}</p>}
-
-      <div className="buttons">
-        <button type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
-        <button type="button" onClick={onCancel}>Cancel</button>
+    <div className="listings">
+      <div className="ls-header">
+        <h1>{editing ? `Edit listing ${listing.listingId}` : 'Add a listing'}</h1>
       </div>
-    </form>
+
+      {error && <div className="message error">{error}</div>}
+
+      <form className="card ls-form" onSubmit={save} noValidate>
+        <div className="full">
+          <label htmlFor="f-address">Address</label>
+          <input id="f-address" value={form.address} onChange={change('address')} maxLength={100}
+                 placeholder="Nørrebrogade 45, 2. th." />
+          <span className="hint">Street address from the ad, up to 100 characters.</span>
+        </div>
+
+        <div>
+          <label htmlFor="f-area">City</label>
+          <select id="f-area" value={form.area} onChange={change('area')}>
+            <option value="">Choose a city</option>
+            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <span className="hint">Used to find the right price benchmark.</span>
+        </div>
+
+        <div>
+          <label htmlFor="f-rent">Monthly rent (kr)</label>
+          <input id="f-rent" type="number" step="0.01" min="0" value={form.monthlyRent} onChange={change('monthlyRent')} />
+          <span className="hint">More than 0 and up to 50,000 kr.</span>
+        </div>
+
+        <div>
+          <label htmlFor="f-size">Size (m²)</label>
+          <input id="f-size" type="number" step="1" value={form.sizeM2} onChange={change('sizeM2')} />
+          <span className="hint">A whole number from 5 to 500.</span>
+        </div>
+
+        <div>
+          <label htmlFor="f-date">Date the ad was posted</label>
+          <input id="f-date" type="date" max={today} value={form.postedDate} onChange={change('postedDate')} />
+          <span className="hint">Cannot be in the future.</span>
+        </div>
+
+        <div className="check full">
+          <input id="f-furnished" type="checkbox" checked={form.furnished} onChange={change('furnished')} />
+          <label htmlFor="f-furnished" style={{ margin: 0 }}>Furnished</label>
+        </div>
+
+        <div className="buttons">
+          <button className="btn" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save'}</button>
+          <button className="btn secondary" type="button" onClick={onCancel}>Cancel</button>
+        </div>
+      </form>
+    </div>
   )
 }
