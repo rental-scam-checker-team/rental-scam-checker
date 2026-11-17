@@ -1,4 +1,9 @@
 
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+
 namespace RSC.Classes
 {
     public class PriceBenchmark
@@ -16,27 +21,121 @@ namespace RSC.Classes
         public DateTime DataDate { get; set; }
 
         public string SourceReference { get; set; } = string.Empty;
-    public string Valid()
-{
-    if (string.IsNullOrWhiteSpace(City))
-        return "City is required.";
 
-    if (PrivateRentPerM2.HasValue && PrivateRentPerM2.Value <= 0)
-        return "Private rent must be greater than zero.";
+        /// <summary>
+        /// Validates the values entered in the form.
+        /// Returns an empty string when all values are valid.
+        /// Otherwise, returns all validation errors.
+        /// </summary>
+        public string Valid(
+            string city,
+            string privateRent,
+            string socialRent,
+            string dataDate,
+            string sourceReference)
+        {
+            var errors = new List<string>();
 
-    if (SocialRentPerM2.HasValue && SocialRentPerM2.Value <= 0)
-        return "Social rent must be greater than zero.";
+            // Allowed cities
+            string[] allowedCities =
+            {
+                "Copenhagen",
+                "Aarhus",
+                "Odense",
+                "Aalborg"
+            };
 
-    if (DataDate == default)
-        return "Data date is required.";
+            // City: required and must be an allowed city
+            city = (city ?? "").Trim();
 
-    if (DataDate.Date > DateTime.Today)
-        return "Data date cannot be in the future.";
+            if (city.Length == 0)
+            {
+                errors.Add("City is required.");
+            }
+            else if (!Array.Exists(
+                allowedCities,
+                c => string.Equals(
+                    c,
+                    city,
+                    StringComparison.OrdinalIgnoreCase)))
+            {
+                errors.Add(
+                    "City must be Copenhagen, Aarhus, Odense or Aalborg.");
+            }
 
-    if (string.IsNullOrWhiteSpace(SourceReference))
-        return "Source reference is required.";
+            // Private rent: optional, but must be a positive number
+            // when provided
+            privateRent = (privateRent ?? "").Trim();
 
-    return string.Empty;
-}
-}
+            if (privateRent.Length > 0)
+            {
+                if (!decimal.TryParse(
+                    privateRent,
+                    NumberStyles.AllowDecimalPoint |
+                    NumberStyles.AllowLeadingSign,
+                    CultureInfo.InvariantCulture,
+                    out decimal privateValue))
+                {
+                    errors.Add("Private rent must be a valid number.");
+                }
+                else if (privateValue <= 0)
+                {
+                    errors.Add("Private rent must be greater than zero.");
+                }
+            }
+
+            // Social rent: optional, but must be a positive number
+            // when provided
+            socialRent = (socialRent ?? "").Trim();
+
+            if (socialRent.Length > 0)
+            {
+                if (!decimal.TryParse(
+                    socialRent,
+                    NumberStyles.AllowDecimalPoint |
+                    NumberStyles.AllowLeadingSign,
+                    CultureInfo.InvariantCulture,
+                    out decimal socialValue))
+                {
+                    errors.Add("Social rent must be a valid number.");
+                }
+                else if (socialValue <= 0)
+                {
+                    errors.Add("Social rent must be greater than zero.");
+                }
+            }
+
+            // Data date: required, must use yyyy-MM-dd,
+            // and cannot be in the future
+            dataDate = (dataDate ?? "").Trim();
+
+            if (!DateTime.TryParseExact(
+                dataDate,
+                "yyyy-MM-dd",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out DateTime parsedDate))
+            {
+                errors.Add("Data date must be a valid date (yyyy-MM-dd).");
+            }
+            else if (parsedDate.Date > DateTime.Today)
+            {
+                errors.Add("Data date cannot be in the future.");
+            }
+
+            // Source reference: required, maximum 200 characters
+            sourceReference = (sourceReference ?? "").Trim();
+
+            if (sourceReference.Length == 0)
+            {
+                errors.Add("Source reference is required.");
+            }
+            else if (sourceReference.Length > 200)
+            {
+               errors.Add("Source reference must be 200 characters or less.");
+            }
+
+            return string.Join(" ", errors);
+        }
+    }
 }
