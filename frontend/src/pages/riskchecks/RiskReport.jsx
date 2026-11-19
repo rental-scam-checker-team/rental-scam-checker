@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { formatDate, getRiskCheck, splitFlags, toInput, updateRiskCheck } from '../../api/riskChecks.js'
+import { formatDate, getPublishedTips, getRiskCheck, runPriceCheck, splitFlags, toInput, updateRiskCheck } from '../../api/riskChecks.js'
+import PriceCheckBox from './PriceCheckBox.jsx'
 import './riskchecks.css'
 
 // What the levels mean, shown to the user
@@ -10,7 +11,7 @@ const LEVEL_TEXT = {
   High: 'Several strong warning signs were found. Do not pay anything until you have seen the flat in person and checked the landlord.',
 }
 
-// General advice until the Safety Tips component (tblSafetyTip) is connected
+// Used only if the Safety tips API (tblSafetyTip) cannot be reached
 const NEXT_STEPS = [
   'View the flat in person, or by a live video call, before paying anything.',
   'Never pay a deposit or rent by MoneyGram, Western Union or gift cards.',
@@ -24,6 +25,8 @@ export default function RiskReport() {
   const location = useLocation()
   const [check, setCheck] = useState(null)
   const [error, setError] = useState('')
+  const [price, setPrice] = useState(null)
+  const [tips, setTips] = useState([])
 
   useEffect(() => {
     let cancelled = false
@@ -35,6 +38,9 @@ export default function RiskReport() {
           c.userNotified = true
         }
         if (!cancelled) setCheck(c)
+        // Price check (RSC-31) and safety tips (Ambika) – the report still works if either fails
+        runPriceCheck(c.listingId).then((p) => { if (!cancelled) setPrice(p) }).catch(() => {})
+        getPublishedTips().then((t) => { if (!cancelled) setTips(t.slice(0, 5)) }).catch(() => {})
       } catch (e) {
         if (!cancelled) setError(e.message)
       }
@@ -72,14 +78,21 @@ export default function RiskReport() {
             {flags.map((f) => <li key={f}>{f}</li>)}
           </ul>
           {check.reviewNote && <p className="hint">Admin note: {check.reviewNote}</p>}
+          {price && <PriceCheckBox result={price} />}
           <p className="hint">This score is guidance based on the listing's details. It does not prove that anyone is a scammer.</p>
         </div>
 
         <div className="card">
           <h2 style={{ marginTop: 0 }}>Safety steps</h2>
-          <ul>
-            {NEXT_STEPS.map((s) => <li key={s}>{s}</li>)}
-          </ul>
+          {tips.length > 0 ? (
+            <ul className="tips-list">
+              {tips.map((t) => <li key={t.tipId}><strong>{t.title}</strong> – {t.description}</li>)}
+            </ul>
+          ) : (
+            <ul>
+              {NEXT_STEPS.map((s) => <li key={s}>{s}</li>)}
+            </ul>
+          )}
         </div>
       </div>
 
