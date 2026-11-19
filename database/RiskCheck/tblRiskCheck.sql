@@ -158,14 +158,15 @@ GO
    3. TEST DATA (needs ListingId 1-10 in tblListing)
    --------------------------------------------------------------------- */
 INSERT INTO dbo.tblRiskCheck (ListingId, RiskScore, Flags, ReviewNote, CheckedDate, UserNotified) VALUES
-(1,  85, N'Rent 58% below area average; asks to pay deposit before viewing', N'Classic advance-payment pattern', '2026-10-01 10:15', 1),
-(2,  12, N'No red flags found', NULL, '2026-10-02 14:30', 1),
-(3,  64, N'Landlord says they are abroad; viewing not possible', NULL, '2026-10-03 09:05', 0),
-(4,  91, N'Rent 62% below average; photos found on Booking.com; pay via MoneyGram', N'Reported to team for review', '2026-10-05 18:40', 1),
-(5,  35, N'Rent 20% below average', NULL, '2026-10-07 11:20', 0),
-(6,  0,  N'No red flags found', N'Boundary test: minimum score', '2026-10-08 08:00', 1),
-(7,  100, N'Deposit above 3 months rent; pressure to pay today; no CPR registration allowed', N'Boundary test: maximum score', '2026-10-10 16:55', 0),
-(8,  47, N'Ad text asks to communicate only by WhatsApp', NULL, '2026-10-12 13:10', 1),
-(9,  73, N'Rent 45% below average; landlord refuses video call', NULL, '2026-10-15 19:25', 0),
-(10, 20, N'Furnished flat slightly below average rent', NULL, '2026-10-20 12:00', 1);
+-- Scores match Aman's listings (tblListing test data). Rent per m2 is compared with the city's usual rent.
+(1,  15,  N'Rent normal for Copenhagen (about 173 kr/m2); no red flags', NULL, '2026-10-01 10:15', 1),
+(2,  92,  N'Rent about 73% below the Copenhagen average (46 kr/m2); asks for deposit before viewing', N'Classic advance-payment pattern', '2026-10-02 14:30', 1),
+(3,  40,  N'Landlord says they are abroad; viewing not possible', N'Boundary test: Medium starts at 40', '2026-10-03 09:05', 0),
+(4,  10,  N'Rent normal for Aarhus; landlord met at viewing', NULL, '2026-10-05 18:40', 1),
+(5,  100, N'Rent about 75% below the Aarhus average (29 kr/m2); photos found on another site; pay via MoneyGram', N'Boundary test: maximum score', '2026-10-07 11:20', 0),
+(6,  0,   N'No red flags found', N'Boundary test: minimum score', '2026-10-08 08:00', 1),
+(7,  69,  N'Ad asks to communicate only by WhatsApp; pressure to decide today', N'Boundary test: Medium ends at 69', '2026-10-10 16:55', 0),
+(8,  25,  N'Rent normal for Aalborg; asks for 3 months deposit (allowed by law)', NULL, '2026-10-12 13:10', 1),
+(9,  88,  N'Rent about 74% below the Aalborg average (25 kr/m2); landlord refuses video call', NULL, '2026-10-15 19:25', 0),
+(10, 39,  N'Rent normal for Copenhagen; furnished; landlord slow to answer', N'Boundary test: Low ends at 39', '2026-10-20 12:00', 1);
 GO
