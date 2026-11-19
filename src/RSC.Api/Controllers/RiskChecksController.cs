@@ -34,6 +34,19 @@ public class RiskChecksController : ControllerBase
     }
 
     /// <summary>FIND: GET /api/riskchecks/5</summary>
+    /// <summary>
+    /// PRICE CHECK (RSC-31): compares a listing's rent per m² with the price benchmark for its city
+    /// and suggests a score. Example: GET /api/riskchecks/pricecheck/2
+    /// </summary>
+    [HttpGet("pricecheck/{listingId:int}")]
+    public ActionResult<PriceCheckResult> RunPriceCheck(int listingId)
+    {
+        var result = PriceCheck.ForListing(listingId);
+        if (result is null)
+            return NotFound(new { error = $"Listing {listingId} does not exist." });
+        return result;
+    }
+
     [HttpGet("{id:int}")]
     public ActionResult<RiskCheck> Find(int id)
     {
