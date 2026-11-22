@@ -99,40 +99,59 @@ export default function ListingsPage() {
 
   return (
     <div className="listings">
-      <div className="listings-header">
+      <div className="ls-header">
         <h1>Listings</h1>
-        <button onClick={() => setFormFor('new')}>Add a listing</button>
+        <button className="btn" onClick={() => setFormFor('new')}>Add a listing</button>
       </div>
 
-      <form className="toolbar" onSubmit={find}>
-        <input type="number" min="1" placeholder="Listing ID" value={findId}
-               onChange={(e) => setFindId(e.target.value)} />
-        <button type="submit">Find</button>
+      {message && <div className="message success">{message}</div>}
+      {error && <div className="message error">{error}</div>}
+
+      {/* Filter (RSC-23): any box left empty is ignored */}
+      <form className="card ls-filters" onSubmit={applyFilters}>
+        <div>
+          <label htmlFor="ls-area">City</label>
+          <select id="ls-area" value={filters.area} onChange={setFilter('area')}>
+            <option value="">All cities</option>
+            {cities.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="ls-min">Min rent (kr)</label>
+          <input id="ls-min" type="number" min="0" value={filters.minRent} onChange={setFilter('minRent')} />
+        </div>
+        <div>
+          <label htmlFor="ls-max">Max rent (kr)</label>
+          <input id="ls-max" type="number" min="0" value={filters.maxRent} onChange={setFilter('maxRent')} />
+        </div>
+        <div>
+          <label htmlFor="ls-furnished">Furnished?</label>
+          <select id="ls-furnished" value={filters.furnished} onChange={setFilter('furnished')}>
+            <option value="">Any</option>
+            <option value="true">Furnished</option>
+            <option value="false">Not furnished</option>
+          </select>
+        </div>
+        <div className="actions">
+          <button className="btn" type="submit">Filter</button>
+          <button className="btn secondary" type="button" onClick={clearFilters}>Clear</button>
+        </div>
       </form>
 
-      <form className="toolbar" onSubmit={applyFilters}>
-        <select value={filters.area} onChange={setFilter('area')}>
-          <option value="">All cities</option>
-          {cities.map((c) => <option key={c} value={c}>{c}</option>)}
-        </select>
-        <input type="number" min="0" placeholder="Min rent" value={filters.minRent} onChange={setFilter('minRent')} />
-        <input type="number" min="0" placeholder="Max rent" value={filters.maxRent} onChange={setFilter('maxRent')} />
-        <select value={filters.furnished} onChange={setFilter('furnished')}>
-          <option value="">Furnished or not</option>
-          <option value="true">Furnished</option>
-          <option value="false">Not furnished</option>
-        </select>
-        <button type="submit">Filter</button>
-        <button type="button" onClick={clearFilters}>Clear</button>
+      {/* Find (RSC-22) */}
+      <form className="ls-find" onSubmit={find}>
+        <div>
+          <label htmlFor="ls-find">Find by ID</label>
+          <input id="ls-find" type="number" min="1" value={findId} onChange={(e) => setFindId(e.target.value)} />
+        </div>
+        <button className="btn secondary" type="submit">Find</button>
       </form>
 
-      {error && <p className="error">{error}</p>}
-      {message && <p className="message">{message}</p>}
-
-      {listings.length === 0 && !error && !message ? (
-        <p>No listings yet. Add a listing to get started.</p>
+      {/* List (RSC-21) */}
+      {listings.length === 0 ? (
+        !error && !message && <div className="card">No listings yet. Add a listing to get started.</div>
       ) : (
-        <table>
+        <table className="ls-table">
           <thead>
             <tr>
               <th>ID</th><th>Address</th><th>City</th><th>Rent (kr)</th>
@@ -142,17 +161,17 @@ export default function ListingsPage() {
           <tbody>
             {listings.map((l) => (
               <tr key={l.listingId}>
-                <td>{l.listingId}</td>
+                <td className="num">{l.listingId}</td>
                 <td>{l.address}</td>
                 <td>{l.area}</td>
-                <td>{l.monthlyRent.toLocaleString('da-DK')}</td>
-                <td>{l.sizeM2}</td>
+                <td className="num">{l.monthlyRent.toLocaleString('da-DK')}</td>
+                <td className="num">{l.sizeM2}</td>
                 <td>{l.postedDate.slice(0, 10)}</td>
-                <td>{l.furnished ? 'Yes' : 'No'}</td>
-                <td className="actions">
+                <td><span className={`ls-badge ${l.furnished ? 'yes' : 'no'}`}>{l.furnished ? 'Yes' : 'No'}</span></td>
+                <td className="row-actions">
                   {/* Edit and Delete are admin functions: hide them for normal users when the shared login is ready */}
-                  <button onClick={() => setFormFor(l)}>Edit</button>
-                  <button onClick={() => remove(l)}>Delete</button>
+                  <button className="btn secondary" onClick={() => setFormFor(l)}>Edit</button>
+                  <button className="btn danger" onClick={() => remove(l)}>Delete</button>
                 </td>
               </tr>
             ))}
