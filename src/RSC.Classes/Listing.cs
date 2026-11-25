@@ -11,7 +11,7 @@ public class Listing
 {
     // The cities in the price benchmark data. Area must be one of these,
     // otherwise the price check cannot find a benchmark.
-    // TODO: check the full list with Shrayana/Guru and add any missing cities.
+    // Checked with Shrayana: these match the cities in tblPriceBenchmark.
     public static readonly string[] AllowedCities = { "Copenhagen", "Aarhus", "Odense", "Aalborg" };
 
     // Validation limits, kept in one place so the tests and the rules match
