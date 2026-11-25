@@ -1,0 +1,35 @@
+.login-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 3rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.login-card h1 {
+  margin-bottom: 0.25rem;
+}
+
+.login-card .btn {
+  margin-top: 0.75rem;
+}
+
+.topbar-user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.topbar-logout {
+  background: transparent;
+  color: var(--brand-ink);
+  border-color: var(--brand-ink);
+  padding: 0.25rem 0.75rem;
+}
