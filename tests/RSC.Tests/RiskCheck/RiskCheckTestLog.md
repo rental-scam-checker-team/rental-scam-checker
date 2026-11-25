@@ -1,10 +1,10 @@
 # Test log: Risk checks (tblRiskCheck)
 
-Owner: Guru Prasad Kandel · Jira: RSC-35 (tests for RSC-25 to RSC-30, RSC-34) · Run date: 2026-11-18
+Owner: Guru Prasad Kandel · Jira: RSC-35 (tests for RSC-25 to RSC-31, RSC-34) · Run dates: 2026-11-18 (sections 1–4), 2026-11-25 (section 5 and full run)
 
-Test files: `tests/RSC.Tests/RiskCheck/RiskCheckValidTests.cs` (validation and risk level), `tests/RSC.Tests/RiskCheck/RiskCheckDatabaseTests.cs` (data layer against SQL Server Express). API tested by hand in Swagger.
+Test files: `tests/RSC.Tests/RiskCheck/RiskCheckValidTests.cs` (validation and risk level), `tests/RSC.Tests/RiskCheck/RiskCheckDatabaseTests.cs` (data layer against SQL Server Express), `tests/RSC.Tests/RiskCheck/PriceCheckTests.cs` (price check, RSC-31). API tested by hand in Swagger.
 
-**Result: 51 of 51 Risk check unit tests passed.** Run together with the rest of the team's tests on main (Listings, Safety tips): 168 of 168 passed, 0 failed (`screenshots/00_dotnet_test_168.png`). All 8 API tests gave the expected result.
+**Result: 66 of 66 Risk check unit tests passed** (51 for validation, risk level and data layer, 15 for the price check). Full team run on main on 2026-11-25 with all four components (Listings, Risk checks, Price benchmarks, Safety tips): **234 of 234 passed, 0 failed**. Earlier run on 2026-11-18 with three components: 168 of 168 (`screenshots/00_dotnet_test_168.png`). All 8 API tests gave the expected result.
 
 Valid values used for the other fields: ListingId "1", RiskScore "50", Flags "Rent 55% below area average", ReviewNote "Checked by admin", CheckedDate today.
 
@@ -88,6 +88,30 @@ Rule: score 0–39 = Low, 40–69 = Medium, 70–100 = High.
 | A06 | DELETE /api/riskchecks/25 | id 25 | 204 No Content (deleted) | 204 No Content | Pass | `screenshots/06_delete_204.jpg` |
 | A07 | DELETE /api/riskchecks/24 | id that no longer exists | 404 + error message | 404, "No risk check with ID 24." | Pass | `screenshots/07_delete_missing_404.png` |
 | A08 | POST /api/riskchecks | riskScore 150 (invalid) | 400 + validation message | 400, "Risk score must be between 0 and 100." | Pass | `screenshots/08_post_invalid_400.jpg` |
+
+## 5. Price check tests – PriceCheck (RSC-31)
+
+Rule: % below the city benchmark → suggested score: 60% or more = 90, 40–59.99% = 70, 30–39.99% = 50, below 30% = 10. Tests use a 200 kr/m² benchmark and a 100 m² flat (1% = 2 kr/m²), so no database is needed.
+
+| ID | Test | Input | Boundary | Expected | Actual | Pass/Fail |
+| --- | --- | --- | --- | --- | --- | --- |
+| P01 | AboveBenchmarkIsNormal | 20% above benchmark | extreme min | 10 | 10 | Pass |
+| P02 | ExactlyBenchmarkIsNormal | 0% below | mid of normal band | 10 | 10 | Pass |
+| P03 | JustUnder30IsNormal | 29.5% below | 30% boundary − 0.5 | 10 | 10 | Pass |
+| P04 | Exactly30IsMedium | 30% below | 30% boundary | 50 | 50 | Pass |
+| P05 | JustUnder40IsMedium | 39.5% below | 40% boundary − 0.5 | 50 | 50 | Pass |
+| P06 | Exactly40IsHigh | 40% below | 40% boundary | 70 | 70 | Pass |
+| P07 | JustUnder60IsHigh | 59.5% below | 60% boundary − 0.5 | 70 | 70 | Pass |
+| P08 | Exactly60IsVeryHigh | 60% below | 60% boundary | 90 | 90 | Pass |
+| P09 | ExtremeCheapIsVeryHigh | 99% below | extreme max | 90 | 90 | Pass |
+| P10 | SuggestedScoresGiveExpectedLevels | scores 10, 50, 70, 90 | level edges | Low, Medium, High, High | Low, Medium, High, High | Pass |
+| P11 | RentPerM2AndPercentAreCorrect | 3200 kr, 70 m², benchmark 225 (Amagerbrogade) | real data | 45.71 kr/m², 79.7% below, score 90, flag "below the Copenhagen average" | as expected | Pass |
+| P12 | NormalRentFlagSaysNormal | 9500 kr, 55 m², benchmark 225 | real data | flag "normal range" | as expected | Pass |
+| P13 | NoBenchmarkGivesNormalScoreAndMessage | benchmark missing (null) | missing data | score 10, no %, "No active price benchmark" | as expected | Pass |
+| P14 | ZeroSizeDoesNotCrash | size 0 m² | invalid (divide by zero) | score 10, "not possible" | as expected | Pass |
+| P15 | ZeroRentDoesNotCrash | rent 0 kr | invalid | score 10 | 10 | Pass |
+
+API check (2026-11-25, running API on localhost:5024): `GET /api/riskchecks/pricecheck/2` → 200, 45.71 vs 225 kr/m², suggested score 90. `GET /api/riskchecks/pricecheck/9999` → 404 "Listing 9999 does not exist."
 
 ## Notes
 
