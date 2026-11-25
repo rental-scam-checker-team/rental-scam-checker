@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { addRiskCheck, getRiskCheck, toInput, updateRiskCheck } from '../../api/riskChecks.js'
+import { addRiskCheck, getRiskCheck, runPriceCheck, toInput, updateRiskCheck } from '../../api/riskChecks.js'
+import PriceCheckBox from './PriceCheckBox.jsx'
 import './riskchecks.css'
 
 const today = () => new Date().toISOString().slice(0, 10)
 
 // ADD and EDIT a risk check (RSC-25, RSC-26). The API runs RiskCheck.Valid() and returns any errors.
+// "Run price check" (RSC-31) compares the listing with the price benchmark and suggests a score.
 export default function RiskCheckForm() {
   const { id } = useParams()
   const editing = Boolean(id)
@@ -15,6 +17,9 @@ export default function RiskCheckForm() {
   })
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
+  const [price, setPrice] = useState(null)
+  const [priceError, setPriceError] = useState('')
+  const [checking, setChecking] = useState(false)
 
   useEffect(() => {
     if (!editing) return
@@ -24,6 +29,38 @@ export default function RiskCheckForm() {
   function change(e) {
     const { name, value, type, checked } = e.target
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
+    if (name === 'listingId') {
+      setPrice(null)
+      setPriceError('')
+    }
+  }
+
+  async function checkPrice() {
+    setPrice(null)
+    setPriceError('')
+    if (!form.listingId) {
+      setPriceError('Enter a listing ID first.')
+      return
+    }
+    setChecking(true)
+    try {
+      setPrice(await runPriceCheck(form.listingId))
+    } catch (e) {
+      setPriceError(e.message)
+    } finally {
+      setChecking(false)
+    }
+  }
+
+  // Puts the suggested score in the form and adds the price finding to the flags
+  function applySuggestion() {
+    const flags = form.flags.trim()
+    const alreadyThere = flags.includes(price.flag)
+    setForm({
+      ...form,
+      riskScore: Math.max(Number(form.riskScore) || 0, price.suggestedScore),
+      flags: alreadyThere ? flags : (flags ? `${price.flag}; ${flags}` : price.flag).slice(0, 500),
+    })
   }
 
   async function save(e) {
@@ -61,6 +98,23 @@ export default function RiskCheckForm() {
           <input id="listingId" name="listingId" type="number" min="1" value={form.listingId} onChange={change} />
           <span className="hint">The listing that was checked.</span>
         </div>
+        <div className="price-run">
+          <button className="btn secondary" type="button" onClick={checkPrice} disabled={checking}>
+            {checking ? 'Checking…' : 'Run price check'}
+          </button>
+          <span className="hint">Compares the rent per m² with the price benchmark for the listing's city.</span>
+        </div>
+
+        {priceError && <div className="full message error">{priceError}</div>}
+        {price && (
+          <div className="full">
+            <PriceCheckBox result={price} />
+            <button className="btn" type="button" onClick={applySuggestion} style={{ marginTop: '0.5rem' }}>
+              Use suggested score ({price.suggestedScore}) and add the finding to Flags
+            </button>
+          </div>
+        )}
+
         <div>
           <label htmlFor="riskScore">Risk score (0–100)</label>
           <input id="riskScore" name="riskScore" type="number" min="0" max="100" value={form.riskScore} onChange={change} />

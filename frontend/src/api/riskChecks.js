@@ -54,6 +54,18 @@ export function deleteRiskCheck(id) {
   return send(`${BASE}/${id}`, { method: 'DELETE' })
 }
 
+// PRICE CHECK (RSC-31): compares the listing's rent per m² with the city's price benchmark
+export function runPriceCheck(listingId) {
+  return send(`${BASE}/pricecheck/${listingId}`)
+}
+
+// Published safety tips (Ambika's API), most important first
+export async function getPublishedTips() {
+  const res = await fetch('/api/safetytips?isPublished=true')
+  if (!res.ok) return []
+  return res.json()
+}
+
 // Helpers shared by the pages
 export function toInput(check) {
   return {

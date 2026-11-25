@@ -1,0 +1,133 @@
+
+/* Styles for the Price Benchmarks pages (owner: Shrayana) */
+
+.pricebenchmarks,
+.pricebenchmark-form {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 16px;
+  text-align: left;
+}
+
+/* Page heading */
+.pricebenchmarks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.pricebenchmarks-header h1 {
+  margin: 0;
+}
+
+/* Search and filter toolbars */
+.pricebenchmarks .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.pricebenchmarks .toolbar input {
+  width: 150px;
+}
+
+.pricebenchmarks .toolbar select {
+  min-width: 150px;
+}
+
+/* Benchmark table */
+.pricebenchmarks table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.pricebenchmarks th,
+.pricebenchmarks td {
+  border-bottom: 1px solid #ccc;
+  padding: 9px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.pricebenchmarks th {
+  background: #f5f5f5;
+  font-weight: 600;
+}
+
+.pricebenchmarks .actions {
+  white-space: nowrap;
+}
+
+.pricebenchmarks .actions button {
+  margin-right: 4px;
+}
+
+/* Add and Edit form */
+.pricebenchmark-form {
+  max-width: 600px;
+}
+
+.pricebenchmark-form h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.pricebenchmark-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.pricebenchmark-form input,
+.pricebenchmark-form select,
+.pricebenchmark-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.pricebenchmark-form label.pricebenchmark-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricebenchmark-form label.pricebenchmark-checkbox input {
+  width: auto;
+}
+
+.pricebenchmark-form .buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+/* Error and success messages */
+.pricebenchmarks .error,
+.pricebenchmark-form .error {
+  color: #b00020;
+}
+
+.pricebenchmarks .message,
+.pricebenchmark-form .message {
+  color: #1b5e20;
+}
+
+/* Responsive layout for smaller screens */
+@media (max-width: 768px) {
+  .pricebenchmarks table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .pricebenchmarks-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
