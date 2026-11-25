@@ -2,7 +2,7 @@ namespace RSC.Classes;
 
 /// <summary>
 /// Where the database is. The API sets this at startup from appsettings.json (ConnectionStrings:RSC).
-/// The default is the local SQL Server Express used for development and the database tests.
+/// The default is the shared SQL Server Express instance used for development and database tests.
 /// </summary>
 public static class DbSettings
 {
