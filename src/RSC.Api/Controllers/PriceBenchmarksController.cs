@@ -1,4 +1,5 @@
 
+
 using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using RSC.Classes;
@@ -23,21 +24,25 @@ public class PriceBenchmarksController : ControllerBase
     }
 
     /// <summary>
-    /// What the Add and Edit forms send.
-    /// Text fields allow PriceBenchmark.Valid() to validate user input.
+    /// Input model for adding and updating price benchmarks.
+    /// Rent values accept numbers and can be null.
     /// </summary>
     public class PriceBenchmarkInput
     {
         public string City { get; set; } = "";
-        public string PrivateRentPerM2 { get; set; } = "";
-        public string SocialRentPerM2 { get; set; } = "";
+
+        public decimal? PrivateRentPerM2 { get; set; }
+
+        public decimal? SocialRentPerM2 { get; set; }
+
         public bool IsActive { get; set; } = true;
+
         public string DataDate { get; set; } = "";
+
         public string SourceReference { get; set; } = "";
     }
 
     // GET /api/pricebenchmarks/cities
-    // Returns the cities available for price benchmarks.
     [HttpGet("cities")]
     public ActionResult<string[]> Cities()
     {
@@ -57,15 +62,15 @@ public class PriceBenchmarksController : ControllerBase
         string? city,
         bool? isActive)
     {
-        var benchmarks = new PriceBenchmarkCollection(connectionString);
+        var collection = new PriceBenchmarkCollection(connectionString);
 
         bool filtering =
             !string.IsNullOrWhiteSpace(city) ||
             isActive.HasValue;
 
         return filtering
-            ? benchmarks.Filter(city, isActive)
-            : benchmarks.GetAll();
+            ? collection.Filter(city, isActive)
+            : collection.GetAll();
     }
 
     // GET /api/pricebenchmarks/5
@@ -76,23 +81,27 @@ public class PriceBenchmarksController : ControllerBase
             new PriceBenchmarkCollection(connectionString).Find(id);
 
         if (benchmark == null)
+        {
             return NotFound(new
             {
                 message = "No price benchmark found with that ID."
             });
+        }
 
         return benchmark;
     }
 
     // POST /api/pricebenchmarks
-    // Add a benchmark after validation.
     [HttpPost]
-    public ActionResult<PriceBenchmark> Add(PriceBenchmarkInput input)
+    public ActionResult<PriceBenchmark> Add(
+        [FromBody] PriceBenchmarkInput input)
     {
         var (benchmark, errors) = BuildBenchmark(input);
 
         if (benchmark == null)
+        {
             return BadRequest(new { message = errors });
+        }
 
         benchmark.BenchmarkId =
             new PriceBenchmarkCollection(connectionString).Add(benchmark);
@@ -104,26 +113,32 @@ public class PriceBenchmarksController : ControllerBase
     }
 
     // PUT /api/pricebenchmarks/5
-    // Update an existing benchmark after validation.
     [HttpPut("{id:int}")]
     public ActionResult<PriceBenchmark> Update(
         int id,
-        PriceBenchmarkInput input)
+        [FromBody] PriceBenchmarkInput input)
     {
         var (benchmark, errors) = BuildBenchmark(input);
 
         if (benchmark == null)
+        {
             return BadRequest(new { message = errors });
+        }
 
         benchmark.BenchmarkId = id;
 
-        if (!new PriceBenchmarkCollection(connectionString).Update(benchmark))
+        bool updated =
+            new PriceBenchmarkCollection(connectionString).Update(benchmark);
+
+        if (!updated)
+        {
             return NotFound(new
             {
                 message = "This price benchmark no longer exists."
             });
+        }
 
-        return benchmark;
+        return Ok(benchmark);
     }
 
     // DELETE /api/pricebenchmarks/5
@@ -134,10 +149,12 @@ public class PriceBenchmarksController : ControllerBase
             new PriceBenchmarkCollection(connectionString).Delete(id);
 
         if (!deleted)
+        {
             return NotFound(new
             {
                 message = "This price benchmark no longer exists."
             });
+        }
 
         return NoContent();
     }
@@ -145,43 +162,42 @@ public class PriceBenchmarksController : ControllerBase
     // ---------- HELPERS ----------
 
     /// <summary>
-    /// Validates and converts form input into a PriceBenchmark object.
+    /// Validates and converts input into a PriceBenchmark object.
     /// </summary>
     private static (PriceBenchmark? Benchmark, string Errors)
         BuildBenchmark(PriceBenchmarkInput input)
     {
+        if (input == null)
+        {
+            return (null, "Request body is required.");
+        }
+
+        string privateRentText =
+            input.PrivateRentPerM2?.ToString(CultureInfo.InvariantCulture) ?? "";
+
+        string socialRentText =
+            input.SocialRentPerM2?.ToString(CultureInfo.InvariantCulture) ?? "";
+
         var benchmark = new PriceBenchmark();
 
         string errors = benchmark.Valid(
             input.City,
-            input.PrivateRentPerM2,
-            input.SocialRentPerM2,
+            privateRentText,
+            socialRentText,
             input.DataDate,
             input.SourceReference);
 
-        if (errors != "")
+        if (!string.IsNullOrEmpty(errors))
+        {
             return (null, errors);
-
-        // Convert optional rent values.
-        benchmark.PrivateRentPerM2 =
-            string.IsNullOrWhiteSpace(input.PrivateRentPerM2)
-                ? null
-                : decimal.Parse(
-                    input.PrivateRentPerM2,
-                    NumberStyles.AllowDecimalPoint |
-                    NumberStyles.AllowLeadingSign,
-                    CultureInfo.InvariantCulture);
-
-        benchmark.SocialRentPerM2 =
-            string.IsNullOrWhiteSpace(input.SocialRentPerM2)
-                ? null
-                : decimal.Parse(
-                    input.SocialRentPerM2,
-                    NumberStyles.AllowDecimalPoint |
-                    NumberStyles.AllowLeadingSign,
-                    CultureInfo.InvariantCulture);
+        }
 
         benchmark.City = input.City.Trim();
+
+        benchmark.PrivateRentPerM2 = input.PrivateRentPerM2;
+
+        benchmark.SocialRentPerM2 = input.SocialRentPerM2;
+
         benchmark.IsActive = input.IsActive;
 
         benchmark.DataDate = DateTime.ParseExact(
